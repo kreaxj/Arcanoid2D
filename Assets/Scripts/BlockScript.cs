@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class BlockScript : MonoBehaviour
 {
     public GameObject textObject;
@@ -11,7 +12,7 @@ public class BlockScript : MonoBehaviour
 
     PlayerScript playerScript;
 
-    void Start()
+    protected virtual void Start()
     {
         if (textObject != null)
         {
@@ -22,8 +23,9 @@ public class BlockScript : MonoBehaviour
         playerScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>();
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.CompareTag("Ball"))
         {
             hitsToDestroy--;
             if (hitsToDestroy == 0)

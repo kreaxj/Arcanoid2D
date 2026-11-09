@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resetOnStart: 1
   level: 1
-  balls: 6
-  points: 0
+  balls: 1
+  points: 560
+  pointsToBall: 160
+  music: 1
+  sound: 1
