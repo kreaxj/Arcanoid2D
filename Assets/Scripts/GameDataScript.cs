@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
 [CreateAssetMenu(fileName = "GameData", menuName = "Game Data", order = 51)]
 public class GameDataScript : ScriptableObject
 {
@@ -12,6 +11,9 @@ public class GameDataScript : ScriptableObject
     public bool music = true;
     public bool sound = true;
 
+    [Range(0f, 1f)] public float musicVolume = 0.2f;
+    [Range(0f, 1f)] public float soundVolume = 1f;
+
     public void Reset()
     {
         level = 1;
@@ -19,6 +21,7 @@ public class GameDataScript : ScriptableObject
         points = 0;
         pointsToBall = 0;
     }
+
     public void Save()
     {
         PlayerPrefs.SetInt("level", level);
@@ -27,6 +30,8 @@ public class GameDataScript : ScriptableObject
         PlayerPrefs.SetInt("pointsToBall", pointsToBall);
         PlayerPrefs.SetInt("music", music ? 1 : 0);
         PlayerPrefs.SetInt("sound", sound ? 1 : 0);
+        PlayerPrefs.SetFloat("musicVolume", musicVolume);
+        PlayerPrefs.SetFloat("soundVolume", soundVolume);
     }
 
     public void Load()
@@ -37,5 +42,7 @@ public class GameDataScript : ScriptableObject
         pointsToBall = PlayerPrefs.GetInt("pointsToBall", 0);
         music = PlayerPrefs.GetInt("music", 1) == 1;
         sound = PlayerPrefs.GetInt("sound", 1) == 1;
+        musicVolume = PlayerPrefs.GetFloat("musicVolume", musicVolume);
+        soundVolume = PlayerPrefs.GetFloat("soundVolume", soundVolume);
     }
 }

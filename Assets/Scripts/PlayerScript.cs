@@ -23,7 +23,8 @@ public class PlayerScript : MonoBehaviour
     public GameDataScript gameData;
     static bool gameStarted = false;
 
-    AudioSource audioSrc;
+    AudioSource musicSource;
+    AudioSource sfxSource;
     public AudioClip pointSound;
 
     int requiredPointsToBall
@@ -32,6 +33,12 @@ public class PlayerScript : MonoBehaviour
     string OnOff(bool boolVal)
     {
         return boolVal ? "on" : "off";
+    }
+
+    public void PlaySound(AudioClip clip, float volumeScale = 1f)
+    {
+        if (gameData.sound && sfxSource != null)
+            sfxSource.PlayOneShot(clip, volumeScale);
     }
 
     void CreateBlocks(GameObject prefab, float xMax, float yMax,
@@ -82,8 +89,7 @@ public class PlayerScript : MonoBehaviour
     void SetBackground()
     {
         var bg = GameObject.Find("Background").GetComponent<SpriteRenderer>();
-        bg.sprite = Resources.Load(level.ToString("d2"),
-        typeof(Sprite)) as Sprite;
+        bg.sprite = Resources.Load(level.ToString("d2"),typeof(Sprite)) as Sprite;
     }
 
     IEnumerator BallDestroyedCoroutine()
@@ -94,8 +100,9 @@ public class PlayerScript : MonoBehaviour
                 CreateBalls();
             else
             {
-                gameData.Reset();
-                SceneManager.LoadScene("MainScene");
+
+                FindObjectOfType<UIManager>().ShowGameOverPanel();
+                Time.timeScale = 0f;
             }
     }
 
@@ -120,7 +127,7 @@ public class PlayerScript : MonoBehaviour
         for (int i = 0; i < 10; i++)
         {
             yield return new WaitForSeconds(0.2f);
-            audioSrc.PlayOneShot(pointSound, 5);
+            PlaySound(pointSound, 5f);
         }
     }
 
@@ -128,7 +135,7 @@ public class PlayerScript : MonoBehaviour
     {
         gameData.points += points;
         if (gameData.sound)
-            audioSrc.PlayOneShot(pointSound, 5);
+            PlaySound(pointSound, 5f);
         gameData.pointsToBall += points;
         if (gameData.pointsToBall >= requiredPointsToBall)
         {
@@ -142,6 +149,9 @@ public class PlayerScript : MonoBehaviour
 
     void OnGUI()
     {
+        if (Time.timeScale == 0f && (FindObjectOfType<UIManager>().startPanel.activeSelf || FindObjectOfType<UIManager>().gameOverPanel.activeSelf))
+            return;
+
         GUI.Label(new Rect(5, 4, Screen.width - 10, 100),
         string.Format(
         "<color=yellow><size=30>Level <b>{0}</b> Balls <b>{1}</b>" +
@@ -161,23 +171,44 @@ public class PlayerScript : MonoBehaviour
         OnOff(!gameData.sound)), style);
     }
 
-    void SetMusic()
+    public void SetMusic()
     {
         if (gameData.music)
-            audioSrc.Play();
-        else
-            audioSrc.Stop();
+        {
+            musicSource.volume = gameData.musicVolume;
+            if (!musicSource.isPlaying) musicSource.Play();
+        }
+        else musicSource.Stop();
     }
+
+    public void SetMusicVolume() { musicSource.volume = gameData.musicVolume; }
+
+    public void SetSoundVolume()
+    {
+        if (sfxSource != null) sfxSource.volume = gameData.soundVolume;
+    }
+
     void OnApplicationQuit()
     {
         gameData.Save();
     }
 
+    public void StartGame()
+    {
+        Cursor.visible = false;
+        level = gameData.level;
+        SetBackground();
+        StartLevel();
+    }
+
+    void Awake()
+    {
+        musicSource = Camera.main.GetComponents<AudioSource>()[0];
+        sfxSource = Camera.main.GetComponents<AudioSource>()[1];
+    }
+
     void Start()
     {
-        audioSrc = Camera.main.GetComponent<AudioSource>();
-        SetBackground();
-        Cursor.visible = false;
         if (!gameStarted)
         {
             gameStarted = true;
@@ -186,7 +217,8 @@ public class PlayerScript : MonoBehaviour
         }
         level = gameData.level;
         SetMusic();
-        StartLevel();
+        SetSoundVolume();
+        SetBackground();
     }
 
     void Update()
@@ -207,12 +239,6 @@ public class PlayerScript : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))
             gameData.sound = !gameData.sound;
-
-        if (Input.GetButtonDown("Pause"))
-            if (Time.timeScale > 0)
-                Time.timeScale = 0;
-            else
-                Time.timeScale = 1;
 
         if (Input.GetKeyDown(KeyCode.N))
         {
