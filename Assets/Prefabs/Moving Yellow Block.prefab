@@ -172,6 +172,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11d7afb67b378d549ba87976b8d87c1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _blockType: 4
+  _bonusScript: {fileID: 0}
   textObject: {fileID: 0}
   hitsToDestroy: 1
   points: 10

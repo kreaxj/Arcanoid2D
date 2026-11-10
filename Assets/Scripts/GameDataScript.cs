@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+
+public enum BonusKind
+{
+    Slow,
+    Fast,
+    Plus2,
+    Plus10
+}
 
 [CreateAssetMenu(fileName = "GameData", menuName = "Game Data", order = 51)]
 public class GameDataScript : ScriptableObject
@@ -44,5 +53,37 @@ public class GameDataScript : ScriptableObject
         sound = PlayerPrefs.GetInt("sound", 1) == 1;
         musicVolume = PlayerPrefs.GetFloat("musicVolume", musicVolume);
         soundVolume = PlayerPrefs.GetFloat("soundVolume", soundVolume);
+    }
+
+    [Serializable]
+    public struct BonusWeight
+    {
+        public BonusKind kind;
+        [Min(0f)] public float weight;
+    }
+
+    [Header("Bonus spawn weights")]
+    public BonusWeight[] bonusWeights = new[]
+    {
+        new BonusWeight { kind = BonusKind.Slow, weight = 5f },
+        new BonusWeight { kind = BonusKind.Fast, weight = 2f },
+        new BonusWeight { kind = BonusKind.Plus2, weight = 2f },
+        new BonusWeight { kind = BonusKind.Plus10, weight = 1f },
+    };
+
+    public BonusKind GetRandomBonusKind()
+    {
+        float total = 0f;
+        foreach (var b in bonusWeights) total += Mathf.Max(0f, b.weight);
+        if (total <= 0f) return BonusKind.Slow;
+
+        float r = UnityEngine.Random.Range(0f, total);
+        float acc = 0f;
+        foreach (var b in bonusWeights)
+        {
+            acc += Mathf.Max(0f, b.weight);
+            if (r <= acc) return b.kind;
+        }
+        return BonusKind.Slow;
     }
 }

@@ -13,11 +13,20 @@ MonoBehaviour:
   m_Name: GameData
   m_EditorClassIdentifier: 
   resetOnStart: 1
-  level: 1
-  balls: 6
-  points: 0
-  pointsToBall: 0
-  music: 1
-  sound: 1
+  level: 4
+  balls: 10
+  points: 2330
+  pointsToBall: 230
+  music: 0
+  sound: 0
   musicVolume: 0.5
   soundVolume: 1
+  bonusWeights:
+  - kind: 0
+    weight: 0
+  - kind: 1
+    weight: 0
+  - kind: 2
+    weight: 0
+  - kind: 3
+    weight: 1

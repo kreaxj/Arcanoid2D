@@ -223,6 +223,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b2cc5f19530814fb760b3a26471756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _blockType: 0
+  _bonusScript: {fileID: 2640116178526093447, guid: cb3c3f68c3fd67844ae486b4c0d597fe, type: 3}
+  _gameData: {fileID: 11400000, guid: ff7c653617e132541b69a4fb18572a9e, type: 2}
   textObject: {fileID: 1981026274714271629}
   hitsToDestroy: 2
   points: 20

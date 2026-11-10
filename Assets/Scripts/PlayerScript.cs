@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.VFX;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -27,8 +28,7 @@ public class PlayerScript : MonoBehaviour
     AudioSource sfxSource;
     public AudioClip pointSound;
 
-    int requiredPointsToBall
-    { get { return 400 + (level - 1) * 20; } }
+    int requiredPointsToBall { get { return 400 + (level - 1) * 20; } }
 
     string OnOff(bool boolVal)
     {
@@ -60,18 +60,28 @@ public class PlayerScript : MonoBehaviour
             }
     }
 
+    public void CreateBalls(int count, bool spawnOnStart)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 spawnPos = transform.position + new Vector3(0.6f, 1.5f, 0f);
+            var obj = Instantiate(ballPrefab, spawnPos, Quaternion.identity);
+            var ball = obj.GetComponent<BallScript>();
+            ball.ballInitialForce += new Vector2(2f * i, 0);
+            ball.ballInitialForce *= 1 + level * ballVelocityMult;
+
+            if (!spawnOnStart)
+            {
+                ball.LaunchBall();
+            }
+        }
+    }
+
     void CreateBalls()
     {
         int count = 2;
-        if (gameData.balls == 1)
-            count = 1;
-        for (int i = 0; i < count; i++)
-        {
-            var obj = Instantiate(ballPrefab);
-            var ball = obj.GetComponent<BallScript>();
-            ball.ballInitialForce += new Vector2(10 * i, 0);
-            ball.ballInitialForce *= 1 + level * ballVelocityMult;
-        }
+        if (gameData.balls == 1) count = 1;
+        CreateBalls(count, true);
     }
 
     void StartLevel()
@@ -152,23 +162,29 @@ public class PlayerScript : MonoBehaviour
         if (Time.timeScale == 0f && (FindObjectOfType<UIManager>().startPanel.activeSelf || FindObjectOfType<UIManager>().gameOverPanel.activeSelf))
             return;
 
-        GUI.Label(new Rect(5, 4, Screen.width - 10, 100),
-        string.Format(
-        "<color=yellow><size=30>Level <b>{0}</b> Balls <b>{1}</b>" +
-        " Score <b>{2}</b></size></color>",
-        gameData.level, gameData.balls, gameData.points));
+        GUI.Label(new Rect(5, 4, Screen.width - 10, 100), string.Format(
+            "<color=yellow><size=30>Level <b>{0}</b> Balls <b>{1}</b>" +
+            " Score <b>{2}</b></size></color>",
+            gameData.level, 
+            gameData.balls, 
+            gameData.points)
+        );
+
         GUIStyle style = new GUIStyle();
         style.alignment = TextAnchor.UpperRight;
-        GUI.Label(new Rect(5, 14, Screen.width - 10, 100),
-        string.Format(
-        "<color=yellow><size=20><color=white>Space</color>-pause {0}" +
-        " <color=white>N</color>-new" +
-        " <color=white>J</color>-jump" +
-        " <color=white>M</color>-music {1}" +
-        " <color=white>S</color>-sound {2}" +
-        " <color=white>Esc</color>-exit</size></color>",
-        OnOff(Time.timeScale > 0), OnOff(!gameData.music),
-        OnOff(!gameData.sound)), style);
+
+        GUI.Label(new Rect(5, 14, Screen.width - 10, 100), string.Format(
+            "<color=yellow><size=20><color=white>Space</color>-pause {0}" +
+            " <color=white>N</color>-new" +
+            " <color=white>J</color>-jump" +
+            " <color=white>M</color>-music {1}" +
+            " <color=white>S</color>-sound {2}" +
+            " <color=white>Esc</color>-exit</size></color>",
+            OnOff(Time.timeScale > 0), 
+            OnOff(!gameData.music),
+            OnOff(!gameData.sound)), 
+            style
+        );
     }
 
     public void SetMusic()
@@ -252,6 +268,27 @@ public class PlayerScript : MonoBehaviour
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #endif
+        }
+    }
+
+    public void ApplyBonus(int points)
+    {
+        gameData.points += points;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.transform.tag == "Bonus")
+        {
+            collision.transform.GetComponent<BonusBase>().BonusActivate(this);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.transform.tag == "Bonus")
+        {
+            collision.transform.GetComponent<BonusBase>().BonusActivate(this);
         }
     }
 }

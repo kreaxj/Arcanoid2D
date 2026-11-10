@@ -144,6 +144,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b2cc5f19530814fb760b3a26471756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _blockType: 2
+  _bonusScript: {fileID: 0}
   textObject: {fileID: 6753880902117116187}
   hitsToDestroy: 4
   points: 40
