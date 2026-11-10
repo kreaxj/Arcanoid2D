@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class UIManager : MonoBehaviour
 {
@@ -46,6 +47,12 @@ public class UIManager : MonoBehaviour
             if (Time.timeScale > 0) PauseGame();
             else ResumeGame();
         }
+    }
+
+    void ClearSelection()
+    {
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(null);
     }
 
     void SyncUIWithData()
@@ -126,6 +133,7 @@ public class UIManager : MonoBehaviour
         startPanel.SetActive(true);
         pausePanel.SetActive(false);
         gameOverPanel.SetActive(false);
+        ClearSelection();
     }
 
     public void ShowGameOverPanel()
@@ -135,6 +143,7 @@ public class UIManager : MonoBehaviour
         pausePanel.SetActive(false);
         gameOverPanel.SetActive(true);
         SyncUIWithData();
+        ClearSelection();
     }
 
     public void StartGame()
@@ -143,6 +152,7 @@ public class UIManager : MonoBehaviour
         startPanel.SetActive(false);
         Time.timeScale = 1f;
         SyncUIWithData();
+        ClearSelection();
         if (playerScript != null) playerScript.StartGame();
     }
 
@@ -152,6 +162,7 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 0f;
         SyncUIWithData();
         pausePanel.SetActive(true);
+        ClearSelection();
     }
 
     public void ResumeGame()
@@ -159,11 +170,12 @@ public class UIManager : MonoBehaviour
         Cursor.visible = false;
         pausePanel.SetActive(false);
         Time.timeScale = 1f;
+        ClearSelection();
     }
 
     public void RestartGame()
     {
-        Cursor.visible = false;
+        Cursor.visible = true;
         Time.timeScale = 1f;
         gameData.Reset();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
