@@ -130,6 +130,7 @@ public class UIManager : MonoBehaviour
 
     public void ShowStartPanel()
     {
+        Cursor.visible = true;
         startPanel.SetActive(true);
         pausePanel.SetActive(false);
         gameOverPanel.SetActive(false);
